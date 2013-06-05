@@ -15,7 +15,7 @@ setlocal tabstop=2
 
 function! s:setup_ghc_options()
   " Add '-nocode' for performance
-  let g:ghcmod_ghc_options = ['-nocode']
+  let g:ghcmod_ghc_options = ['-nocode', '-fdefer-type-errors']
   " Setup src and test directories
   let src_dir = finddir('src', '.;')
   if !empty(src_dir)

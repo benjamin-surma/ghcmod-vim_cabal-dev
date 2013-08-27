@@ -35,6 +35,20 @@ function! s:setup_ghc_options()
   if !empty(ghc_dir)
     call add(g:ghcmod_ghc_options, '-package-conf=' . expand(fnamemodify(ghc_dir, ':p') . '**/package.conf.d/'))
   endif
+  " Support for cabal 1.0.18+ sandbox
+  let cabal_sandbox_dir = finddir('.cabal-sandbox', '.;')
+  if !empty(cabal_sandbox_dir)
+    " Setup cabal sandbox package configuration folder
+    let cabal_sandbox_packages_dir = expand(fnamemodify(sort(split(globpath(cabal_sandbox_dir, '*-packages.conf.d'), '\n'))[-1], ':p'))
+    call add(g:ghcmod_ghc_options, '-package-conf=' . cabal_sandbox_packages_dir)
+    " Force individual cabal packages
+    let cabal_sandbox_packages = split(globpath(cabal_sandbox_packages_dir, '*.conf'), '\n')
+    for package_conf in cabal_sandbox_packages
+      let package = fnamemodify(package_conf, ':t')[:-6] " Remove '.conf'
+      call add(g:ghcmod_ghc_options, '-package-id=' . package)
+    endfor
+  endif
+  " Support for cabal-dev sandbox (deprecated)
   let cabal_dev_dir = finddir('cabal-dev', '.;')
   if !empty(cabal_dev_dir)
     " Setup cabal_dev package configuration folder
